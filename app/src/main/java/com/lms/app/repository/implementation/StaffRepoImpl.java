@@ -2,6 +2,7 @@ package com.lms.app.repository.implementation;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -13,17 +14,17 @@ import org.springframework.stereotype.Repository;
 import com.lms.app.domain.Staff;
 import com.lms.app.dto.StaffDTO;
 import com.lms.app.exception.ApiException;
+import com.lms.app.exception.ResourceNotFoundException;
 import com.lms.app.repository.StaffRepo;
+import com.lms.app.repository.rowmapper.StaffRowMapper;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import static com.lms.app.query.StaffQuery.*;
 import static java.util.Map.of;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
 public class StaffRepoImpl implements StaffRepo<Staff> {
     private final NamedParameterJdbcTemplate jdbc;
     private final BCryptPasswordEncoder encoder;
@@ -45,30 +46,60 @@ public class StaffRepoImpl implements StaffRepo<Staff> {
     }
 
     @Override
-    public List list(int page, int pageSize) {
-        
-        throw new UnsupportedOperationException("Unimplemented method 'list'");
+    public List<StaffDTO> list(int pageIndex, int pageSize) {
+        try {
+            SqlParameterSource params = getPagSqlParameterSource(pageIndex, pageSize);
+            List<StaffDTO> staff =  jdbc.query(SELECT_ALL_FROM_STAFF_QUERY, params, new StaffRowMapper());
+            return staff;
+        } catch (Exception e) {
+            throw new ApiException("Something went wrong");
+        }
     }
 
     @Override
     public StaffDTO get(int id) {
-        
-        throw new UnsupportedOperationException("Unimplemented method 'get'");
+        try {
+            SqlParameterSource params = getStaffIdSqlParameterSource(id);
+            StaffDTO staff =  jdbc.queryForObject(SELECT_STAFF_WHERE_ID_QUERY, params, new StaffRowMapper());
+            return staff;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Staff with id: " + id + " does not exist.");
+        } catch (Exception e) {
+            throw new ApiException("Something went wrong");
+        }
     }
 
     @Override
-    public StaffDTO update(int id, Staff data) {
-        
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public StaffDTO update(int id, Staff staff) {
+        try {
+            SqlParameterSource params = getStaffSqlParameterSource(staff, id);
+            int updatedRows = jdbc.update(UPDATE_STAFF_PROFILE_QUERY, params);
+            if (updatedRows == 0) {
+                throw new ResourceNotFoundException("Staff with id: " + id + " does not exist.");
+            }
+            return get(id);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
     }
 
     @Override
     public int delete(int id) {
-        
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        try {
+            SqlParameterSource params = getStaffIdSqlParameterSource(id);
+            int deletedRows = jdbc.update(DELETE_STAFF_QUERY, params);
+            if (deletedRows == 0) {
+                throw new ResourceNotFoundException("Staff with id: " + id + " does not exist.");
+            }
+            return deletedRows;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ApiException("Something went wrong");
+        }
     }
-
-
 
 
     private SqlParameterSource getStaffSqlParameterSource(Staff stu) {

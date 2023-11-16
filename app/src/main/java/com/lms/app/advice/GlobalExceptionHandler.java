@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
 import com.lms.app.domain.HttpResponse;
 import com.lms.app.exception.ApiException;
