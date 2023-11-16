@@ -7,7 +7,7 @@ public class StudentQuery {
         public static final String INSERT_INTO_STUDENT_QUERY = """
                         INSERT INTO Student (semester, roll_no, first_name, last_name, email, password) VALUES (
                             :semester,
-                            :roll_no,
+                            :rollNo,
                             :firstName,
                             :lastName,
                             :email,

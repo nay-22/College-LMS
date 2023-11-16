@@ -21,8 +21,8 @@ public class CourseRowMapper implements RowMapper<Course> {
         .thumbnail(rs.getString("thumbnail"))
         .semester(rs.getInt("semester"))
         .published(rs.getBoolean("published"))
-        // .createdAt(createdAt)
-        // .lastUpdatedAt(lastUpdatedAt)
+        .createdAt(rs.getTimestamp("created_at"))
+        .lastUpdatedAt(rs.getTimestamp("last_updated_at"))
         .build();
 
     }

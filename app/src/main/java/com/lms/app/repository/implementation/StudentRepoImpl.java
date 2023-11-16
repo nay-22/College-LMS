@@ -8,7 +8,7 @@ import com.lms.app.repository.StudentRepo;
 import com.lms.app.repository.rowmapper.StudentRowMapper;
 
 import lombok.RequiredArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,13 +21,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Map.of;
 
 import static com.lms.app.query.StudentQuery.*;
 
 @Repository
 @RequiredArgsConstructor
-// @Slf4j
+@Slf4j
 public class StudentRepoImpl implements StudentRepo<Student> {
     private final NamedParameterJdbcTemplate jdbc;
     private final BCryptPasswordEncoder encoder;
@@ -41,9 +42,11 @@ public class StudentRepoImpl implements StudentRepo<Student> {
             KeyHolder holder = new GeneratedKeyHolder();
             SqlParameterSource params = getStudentSqlParameterSource(stu);
             jdbc.update(INSERT_INTO_STUDENT_QUERY, params, holder);
+            stu.setCreatedAt(now());
             stu.setId(holder.getKey().intValue());
             return stu;
         } catch (ApiException e) {
+            log.error(e.getMessage());
             throw new ApiException("Something went wrong");
         }
     }

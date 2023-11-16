@@ -1,5 +1,7 @@
 package com.lms.app.repository.implementation;
 
+import static java.time.LocalTime.now;
+
 import java.util.List;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -114,7 +116,8 @@ public class CourseRepoImpl implements CourseRepo<Course> {
         .addValue("id", id)
         .addValue("name", course.getName())
         .addValue("thumbnail", course.getThumbnail())
-        .addValue("semester", course.getSemester());
+        .addValue("semester", course.getSemester())
+        .addValue("last_updated_at", now());
     }
 
     private SqlParameterSource getIdParams(int id) {

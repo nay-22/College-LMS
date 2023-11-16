@@ -16,7 +16,8 @@ public class CourseQuery {
             UPDATE Courses SET 
                 name = :name,
                 thumbnail = :thumbnail,
-                semester = :semester
+                semester = :semester,
+                last_updated_at = : lastUpdatedAt
             WHERE id = :id
             """;
 

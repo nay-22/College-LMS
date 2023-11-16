@@ -1,5 +1,6 @@
 package com.lms.app.domain;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,6 +25,6 @@ public class Course {
     @NotEmpty(message = "Course thumbnail cannot be empty")
     String thumbnail;
     Boolean published;
-    // LocalDateTime createdAt;
-    // LocalDateTime lastUpdatedAt;
+    Timestamp createdAt;
+    Timestamp lastUpdatedAt;
 }
