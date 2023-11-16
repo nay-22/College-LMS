@@ -15,11 +15,22 @@ CREATE SCHEMA IF NOT EXISTS `lms` DEFAULT CHARACTER SET utf8 ;
 USE `lms` ;
 
 -- -----------------------------------------------------
+-- Table `lms`.`Department`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `lms`.`Department` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(256) NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `lms`.`Student`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `lms`.`Student` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `roll_no` VARCHAR(128) NOT NULL,
+  `roll_no` VARCHAR(128) NULL,
   `first_name` VARCHAR(128) NOT NULL,
   `middle_name` VARCHAR(128) NULL,
   `last_name` VARCHAR(128) NOT NULL,
@@ -30,9 +41,16 @@ CREATE TABLE IF NOT EXISTS `lms`.`Student` (
   `dob` DATETIME NULL,
   `address` VARCHAR(255) NULL,
   `created_at` TIMESTAMP(2) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `department_id` INT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC),
-  UNIQUE INDEX `roll_no_UNIQUE` (`roll_no` ASC))
+  UNIQUE INDEX `roll_no_UNIQUE` (`roll_no` ASC),
+  INDEX `fk_Student_Department1_idx` (`department_id` ASC),
+  CONSTRAINT `fk_Student_Department1`
+    FOREIGN KEY (`department_id`)
+    REFERENCES `lms`.`Department` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -50,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `lms`.`Staff` (
   `address` VARCHAR(255) NULL,
   `dob` DATETIME NULL,
   `phone` VARCHAR(10) NULL,
+  `isAdmin` TINYINT NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP(2) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC),
@@ -82,11 +101,11 @@ ENGINE = InnoDB;
 -- Table `lms`.`Courses`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `lms`.`Courses` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `thumbnail` VARCHAR(255) NOT NULL,
   `semester` INT NOT NULL,
-  `department` VARCHAR(256) NOT NULL,
+  `published` TINYINT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -213,6 +232,48 @@ CREATE TABLE IF NOT EXISTS `lms`.`Viewed` (
   CONSTRAINT `fk_ContentViewed_CourseContent1`
     FOREIGN KEY (`content_id`)
     REFERENCES `lms`.`Content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `lms`.`CourseDepartment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `lms`.`CourseDepartment` (
+  `department_id` INT NOT NULL,
+  `courses_id` INT NOT NULL,
+  INDEX `fk_CourseDepartment_Department1_idx` (`department_id` ASC),
+  INDEX `fk_CourseDepartment_Courses1_idx` (`courses_id` ASC),
+  CONSTRAINT `fk_CourseDepartment_Department1`
+    FOREIGN KEY (`department_id`)
+    REFERENCES `lms`.`Department` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_CourseDepartment_Courses1`
+    FOREIGN KEY (`courses_id`)
+    REFERENCES `lms`.`Courses` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `lms`.`StaffDepartment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `lms`.`StaffDepartment` (
+  `department_id` INT NOT NULL,
+  `staff_id` INT NOT NULL,
+  INDEX `fk_StaffDepartment_Department1_idx` (`department_id` ASC),
+  INDEX `fk_StaffDepartment_Staff1_idx` (`staff_id` ASC),
+  CONSTRAINT `fk_StaffDepartment_Department1`
+    FOREIGN KEY (`department_id`)
+    REFERENCES `lms`.`Department` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_StaffDepartment_Staff1`
+    FOREIGN KEY (`staff_id`)
+    REFERENCES `lms`.`Staff` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
