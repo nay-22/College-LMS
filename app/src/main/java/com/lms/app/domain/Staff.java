@@ -28,6 +28,7 @@ public class Staff {
     @NotEmpty(message = "Password cannot be empty")
     private String password;
     private String address;
+    private boolean isAdmin;
     private LocalDateTime dob;
     private LocalDateTime createdAt;
 }
